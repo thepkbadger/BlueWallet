@@ -39,6 +39,7 @@ let BlueApp = require('./BlueApp');
 const { height, width } = Dimensions.get('window');
 const aspectRatio = height / width;
 const BigNumber = require('bignumber.js');
+const currency = require('./currency');
 let isIpad;
 if (aspectRatio > 1.6) {
   isIpad = false;
@@ -2259,14 +2260,30 @@ export class BlueBitcoinAmount extends Component {
       let sat = new BigNumber(amount);
       sat = sat.multipliedBy(100000000).toString();
       localCurrency = loc.formatBalanceWithoutSuffix(sat, BitcoinUnit.LOCAL_CURRENCY, false);
-    } else {
+    } else if (this.props.unit === BitcoinUnit.SATS) {
       localCurrency = loc.formatBalanceWithoutSuffix(amount.toString(), BitcoinUnit.LOCAL_CURRENCY, false);
+    } else if (this.props.unit === BitcoinUnit.LOCAL_CURRENCY) {
+      localCurrency = currency.fiatToBTC(parseFloat(amount));
     }
     if (amount === BitcoinUnit.MAX) localCurrency = ''; // we dont want to display NaN
     return (
       <TouchableWithoutFeedback disabled={this.props.pointerEvents === 'none'} onPress={() => this.textInput.focus()}>
         <View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', paddingTop: 16, paddingBottom: 2 }}>
+            {this.props.unit === BitcoinUnit.LOCAL_CURRENCY && (
+              <Text
+                style={{
+                  color: this.props.disabled ? BlueApp.settings.buttonDisabledTextColor : BlueApp.settings.alternativeTextColor2,
+                  fontSize: 24,
+                  marginHorizontal: 4,
+                  paddingBottom: 6,
+                  fontWeight: '600',
+                  alignSelf: 'flex-end',
+                }}
+              >
+                {currency.preferredFiatCurrency.symbol + ' '}
+              </Text>
+            )}
             <TextInput
               {...this.props}
               keyboardType="numeric"
@@ -2309,21 +2326,25 @@ export class BlueBitcoinAmount extends Component {
                 fontWeight: '600',
               }}
             />
-            <Text
-              style={{
-                color: this.props.disabled ? BlueApp.settings.buttonDisabledTextColor : BlueApp.settings.alternativeTextColor2,
-                fontSize: 16,
-                marginHorizontal: 4,
-                paddingBottom: 6,
-                fontWeight: '600',
-                alignSelf: 'flex-end',
-              }}
-            >
-              {' ' + this.props.unit}
-            </Text>
+            {this.props.unit !== BitcoinUnit.LOCAL_CURRENCY && (
+              <Text
+                style={{
+                  color: this.props.disabled ? BlueApp.settings.buttonDisabledTextColor : BlueApp.settings.alternativeTextColor2,
+                  fontSize: 16,
+                  marginHorizontal: 4,
+                  paddingBottom: 6,
+                  fontWeight: '600',
+                  alignSelf: 'flex-end',
+                }}
+              >
+                {' ' + this.props.unit}
+              </Text>
+            )}
           </View>
           <View style={{ alignItems: 'center', marginBottom: 22, marginTop: 4 }}>
-            <Text style={{ fontSize: 18, color: '#d4d4d4', fontWeight: '600' }}>{localCurrency}</Text>
+            <Text style={{ fontSize: 18, color: '#d4d4d4', fontWeight: '600' }}>
+              {localCurrency} {this.props.unit === BitcoinUnit.LOCAL_CURRENCY ? BitcoinUnit.BTC : null}
+            </Text>
           </View>
         </View>
       </TouchableWithoutFeedback>

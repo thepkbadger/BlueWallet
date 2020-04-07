@@ -918,6 +918,7 @@ export default class SendDetails extends Component {
               transactions[index] = item;
               this.setState({ addresses: transactions });
             }}
+            unit={this.state.fromWallet.preferredBalanceUnit}
             inputAccessoryViewID={this.state.fromWallet.allowSendMax() ? BlueUseAllFundsButton.InputAccessoryViewID : null}
             onFocus={() => this.setState({ isAmountToolbarVisibleForAndroid: true })}
             onBlur={() => this.setState({ isAmountToolbarVisibleForAndroid: false })}
