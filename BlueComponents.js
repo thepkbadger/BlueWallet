@@ -2288,6 +2288,9 @@ export class BlueBitcoinAmount extends Component {
               {...this.props}
               keyboardType="numeric"
               onChangeText={text => {
+                if (this.props.unit === BitcoinUnit.LOCAL_CURRENCY) {
+                  this.props.onChangeText(localCurrency);
+                }
                 text = text.trim();
                 text = text.replace(',', '.');
                 const split = text.split('.');

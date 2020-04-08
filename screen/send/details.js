@@ -15,6 +15,7 @@ import {
   Platform,
   ScrollView,
   Text,
+  InteractionManager,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -102,6 +103,7 @@ export default class SendDetails extends Component {
         networkTransactionFees: new NetworkTransactionFee(1, 1, 1),
         fee: 1,
         feeSliderValue: 1,
+        amountUnit: fromWallet.preferredBalanceUnit,
         bip70TransactionExpiration: null,
         renderWalletSelectionButtonHidden: false,
       };
@@ -909,20 +911,47 @@ export default class SendDetails extends Component {
     for (let [index, item] of this.state.addresses.entries()) {
       rows.push(
         <View style={{ minWidth: width, maxWidth: width, width: width }}>
-          <BlueBitcoinAmount
-            isLoading={this.state.isLoading}
-            amount={item.amount ? item.amount.toString() : null}
-            onChangeText={text => {
-              item.amount = text;
-              const transactions = this.state.addresses;
-              transactions[index] = item;
-              this.setState({ addresses: transactions });
-            }}
-            unit={this.state.fromWallet.preferredBalanceUnit}
-            inputAccessoryViewID={this.state.fromWallet.allowSendMax() ? BlueUseAllFundsButton.InputAccessoryViewID : null}
-            onFocus={() => this.setState({ isAmountToolbarVisibleForAndroid: true })}
-            onBlur={() => this.setState({ isAmountToolbarVisibleForAndroid: false })}
-          />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ flex: 1 }}>
+              <BlueBitcoinAmount
+                isLoading={this.state.isLoading}
+                amount={item.amount ? item.amount.toString() : null}
+                onChangeText={text => {
+                  item.amount = text;
+                  const transactions = this.state.addresses;
+                  transactions[index] = item;
+                  this.setState({ addresses: transactions });
+                }}
+                unit={this.state.amountUnit}
+                inputAccessoryViewID={this.state.fromWallet.allowSendMax() ? BlueUseAllFundsButton.InputAccessoryViewID : null}
+                onFocus={() => this.setState({ isAmountToolbarVisibleForAndroid: true })}
+                onBlur={() => this.setState({ isAmountToolbarVisibleForAndroid: false })}
+              />
+            </View>
+            <BlueButton
+              icon={{
+                name: 'exchange',
+                type: 'font-awesome',
+                color: BlueApp.settings.buttonTextColor,
+              }}
+              style={{ backgroundColor: 'transparent', marginRight: 20, alignSelf: 'center' }}
+              onPress={() =>
+                InteractionManager.runAfterInteractions(async () => {
+                  let walletPreviousPreferredUnit = this.state.amountUnit;
+                  if (walletPreviousPreferredUnit === BitcoinUnit.BTC) {
+                    walletPreviousPreferredUnit = BitcoinUnit.SATS;
+                  } else if (walletPreviousPreferredUnit === BitcoinUnit.SATS) {
+                    walletPreviousPreferredUnit = BitcoinUnit.LOCAL_CURRENCY;
+                  } else if (walletPreviousPreferredUnit === BitcoinUnit.LOCAL_CURRENCY) {
+                    walletPreviousPreferredUnit = BitcoinUnit.BTC;
+                  } else {
+                    walletPreviousPreferredUnit = BitcoinUnit.BTC;
+                  }
+                  this.setState({ amountUnit: walletPreviousPreferredUnit });
+                })
+              }
+            />
+          </View>
           <BlueAddressInput
             onChangeText={async text => {
               text = text.trim();
