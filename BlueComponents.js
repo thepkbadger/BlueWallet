@@ -834,6 +834,10 @@ export class BlueUseAllFundsButton extends Component {
     onUseAllPressed: PropTypes.func.isRequired,
   };
 
+  static defaultProps = {
+    unit: BitcoinUnit.BTC,
+  };
+
   render() {
     const inputView = (
       <View
@@ -865,9 +869,7 @@ export class BlueUseAllFundsButton extends Component {
             <BlueButtonLink
               onPress={this.props.onUseAllPressed}
               style={{ marginLeft: 8, paddingRight: 0, paddingLeft: 0, paddingTop: 12, paddingBottom: 12 }}
-              title={`${loc.formatBalanceWithoutSuffix(this.props.wallet.getBalance(), BitcoinUnit.BTC, true).toString()} ${
-                BitcoinUnit.BTC
-              }`}
+              title={loc.formatBalance(this.props.wallet.getBalance(), this.props.unit, true).toString()}
             />
           ) : (
             <Text
@@ -882,7 +884,7 @@ export class BlueUseAllFundsButton extends Component {
                 paddingBottom: 12,
               }}
             >
-              {loc.formatBalanceWithoutSuffix(this.props.wallet.getBalance(), BitcoinUnit.BTC, true).toString()} {BitcoinUnit.BTC}
+              {loc.formatBalance(this.props.wallet.getBalance(), this.props.unit, true).toString()}
             </Text>
           )}
         </View>
@@ -2288,9 +2290,6 @@ export class BlueBitcoinAmount extends Component {
               {...this.props}
               keyboardType="numeric"
               onChangeText={text => {
-                if (this.props.unit === BitcoinUnit.LOCAL_CURRENCY) {
-                  this.props.onChangeText(localCurrency);
-                }
                 text = text.trim();
                 text = text.replace(',', '.');
                 const split = text.split('.');
@@ -2346,7 +2345,8 @@ export class BlueBitcoinAmount extends Component {
           </View>
           <View style={{ alignItems: 'center', marginBottom: 22, marginTop: 4 }}>
             <Text style={{ fontSize: 18, color: '#d4d4d4', fontWeight: '600' }}>
-              {localCurrency} {this.props.unit === BitcoinUnit.LOCAL_CURRENCY ? BitcoinUnit.BTC : null}
+              {this.props.unit === BitcoinUnit.LOCAL_CURRENCY ? loc.removeTrailingZeros(localCurrency) : localCurrency}
+              {this.props.unit === BitcoinUnit.LOCAL_CURRENCY ? ` ${BitcoinUnit.BTC}` : null}
             </Text>
           </View>
         </View>

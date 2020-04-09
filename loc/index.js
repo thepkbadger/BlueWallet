@@ -145,7 +145,7 @@ strings.transactionTimeToReadable = time => {
   return ret;
 };
 
-function removeTrailingZeros(value) {
+strings.removeTrailingZeros = value => {
   value = value.toString();
 
   if (value.indexOf('.') === -1) {
@@ -169,7 +169,7 @@ strings.formatBalance = (balance, toUnit, withFormatting = false) => {
   }
   if (toUnit === BitcoinUnit.BTC) {
     const value = new BigNumber(balance).dividedBy(100000000).toFixed(8);
-    return removeTrailingZeros(value) + ' ' + BitcoinUnit.BTC;
+    return strings.removeTrailingZeros(value) + ' ' + BitcoinUnit.BTC;
   } else if (toUnit === BitcoinUnit.SATS) {
     return (
       (balance < 0 ? '-' : '') +
@@ -195,7 +195,7 @@ strings.formatBalanceWithoutSuffix = (balance = 0, toUnit, withFormatting = fals
   if (balance !== 0) {
     if (toUnit === BitcoinUnit.BTC) {
       const value = new BigNumber(balance).dividedBy(100000000).toFixed(8);
-      return removeTrailingZeros(value);
+      return strings.removeTrailingZeros(value);
     } else if (toUnit === BitcoinUnit.SATS) {
       return (balance < 0 ? '-' : '') + (withFormatting ? new Intl.NumberFormat().format(balance).replace(/[^0-9]/g, ' ') : balance);
     } else if (toUnit === BitcoinUnit.LOCAL_CURRENCY) {

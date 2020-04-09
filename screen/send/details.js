@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   StyleSheet,
   Dimensions,
+  Image,
   Platform,
   ScrollView,
   Text,
@@ -928,13 +929,8 @@ export default class SendDetails extends Component {
                 onBlur={() => this.setState({ isAmountToolbarVisibleForAndroid: false })}
               />
             </View>
-            <BlueButton
-              icon={{
-                name: 'exchange',
-                type: 'font-awesome',
-                color: BlueApp.settings.buttonTextColor,
-              }}
-              style={{ backgroundColor: 'transparent', marginRight: 20, alignSelf: 'center' }}
+            <TouchableOpacity
+              style={{ alignSelf: 'center', marginRight: 20 }}
               onPress={() =>
                 InteractionManager.runAfterInteractions(async () => {
                   let walletPreviousPreferredUnit = this.state.amountUnit;
@@ -950,7 +946,9 @@ export default class SendDetails extends Component {
                   this.setState({ amountUnit: walletPreviousPreferredUnit });
                 })
               }
-            />
+            >
+              <Image source={require('../../img/round-compare-arrows-24-px.png')} />
+            </TouchableOpacity>
           </View>
           <BlueAddressInput
             onChangeText={async text => {
@@ -1027,10 +1025,11 @@ export default class SendDetails extends Component {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={{ flex: 1, justifyContent: 'space-between' }}>
           <View>
-            <KeyboardAvoidingView behavior="position">
+            <KeyboardAvoidingView behavior="position" >
               <ScrollView
                 pagingEnabled
                 horizontal
+                keyboardShouldPersistTaps={'always'}
                 contentContainerStyle={{ flexWrap: 'wrap', flexDirection: 'row' }}
                 ref={ref => (this.scrollView = ref)}
                 onContentSizeChange={() => this.scrollView.scrollToEnd()}
@@ -1098,9 +1097,11 @@ export default class SendDetails extends Component {
           </View>
           <BlueDismissKeyboardInputAccessory />
           {Platform.select({
-            ios: <BlueUseAllFundsButton onUseAllPressed={this.onUseAllPressed} wallet={this.state.fromWallet} />,
+            ios: (
+              <BlueUseAllFundsButton unit={this.state.amountUnit} onUseAllPressed={this.onUseAllPressed} wallet={this.state.fromWallet} />
+            ),
             android: this.state.isAmountToolbarVisibleForAndroid && (
-              <BlueUseAllFundsButton onUseAllPressed={this.onUseAllPressed} wallet={this.state.fromWallet} />
+              <BlueUseAllFundsButton unit={this.state.amountUnit} onUseAllPressed={this.onUseAllPressed} wallet={this.state.fromWallet} />
             ),
           })}
 
