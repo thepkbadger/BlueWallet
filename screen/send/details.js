@@ -373,6 +373,7 @@ export default class SendDetails extends Component {
     let error = false;
     let requestedSatPerByte = this.state.fee.toString().replace(/\D/g, '');
     for (const [index, transaction] of this.state.addresses.entries()) {
+      console.warn(transaction);
       if (!transaction.amount || transaction.amount < 0 || parseFloat(transaction.amount) === 0) {
         error = loc.send.details.amount_field_is_not_valid;
         console.log('validation error');
@@ -912,44 +913,20 @@ export default class SendDetails extends Component {
     for (let [index, item] of this.state.addresses.entries()) {
       rows.push(
         <View style={{ minWidth: width, maxWidth: width, width: width }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View style={{ flex: 1 }}>
-              <BlueBitcoinAmount
-                isLoading={this.state.isLoading}
-                amount={item.amount ? item.amount.toString() : null}
-                onChangeText={text => {
-                  item.amount = text;
-                  const transactions = this.state.addresses;
-                  transactions[index] = item;
-                  this.setState({ addresses: transactions });
-                }}
-                unit={this.state.amountUnit}
-                inputAccessoryViewID={this.state.fromWallet.allowSendMax() ? BlueUseAllFundsButton.InputAccessoryViewID : null}
-                onFocus={() => this.setState({ isAmountToolbarVisibleForAndroid: true })}
-                onBlur={() => this.setState({ isAmountToolbarVisibleForAndroid: false })}
-              />
-            </View>
-            <TouchableOpacity
-              style={{ alignSelf: 'center', marginRight: 20 }}
-              onPress={() =>
-                InteractionManager.runAfterInteractions(async () => {
-                  let walletPreviousPreferredUnit = this.state.amountUnit;
-                  if (walletPreviousPreferredUnit === BitcoinUnit.BTC) {
-                    walletPreviousPreferredUnit = BitcoinUnit.SATS;
-                  } else if (walletPreviousPreferredUnit === BitcoinUnit.SATS) {
-                    walletPreviousPreferredUnit = BitcoinUnit.LOCAL_CURRENCY;
-                  } else if (walletPreviousPreferredUnit === BitcoinUnit.LOCAL_CURRENCY) {
-                    walletPreviousPreferredUnit = BitcoinUnit.BTC;
-                  } else {
-                    walletPreviousPreferredUnit = BitcoinUnit.BTC;
-                  }
-                  this.setState({ amountUnit: walletPreviousPreferredUnit });
-                })
-              }
-            >
-              <Image source={require('../../img/round-compare-arrows-24-px.png')} />
-            </TouchableOpacity>
-          </View>
+          <BlueBitcoinAmount
+            isLoading={this.state.isLoading}
+            amount={item.amount ? item.amount.toString() : null}
+            onChangeText={text => {
+              item.amount = text;
+              const transactions = this.state.addresses;
+              transactions[index] = item;
+              this.setState({ addresses: transactions });
+            }}
+            unit={this.state.amountUnit}
+            inputAccessoryViewID={this.state.fromWallet.allowSendMax() ? BlueUseAllFundsButton.InputAccessoryViewID : null}
+            onFocus={() => this.setState({ isAmountToolbarVisibleForAndroid: true })}
+            onBlur={() => this.setState({ isAmountToolbarVisibleForAndroid: false })}
+          />
           <BlueAddressInput
             onChangeText={async text => {
               text = text.trim();
@@ -1025,7 +1002,7 @@ export default class SendDetails extends Component {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={{ flex: 1, justifyContent: 'space-between' }}>
           <View>
-            <KeyboardAvoidingView behavior="position" >
+            <KeyboardAvoidingView behavior="position">
               <ScrollView
                 pagingEnabled
                 horizontal
