@@ -12,11 +12,9 @@ import {
   TouchableWithoutFeedback,
   StyleSheet,
   Dimensions,
-  Image,
   Platform,
   ScrollView,
   Text,
-  InteractionManager,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -916,6 +914,7 @@ export default class SendDetails extends Component {
           <BlueBitcoinAmount
             isLoading={this.state.isLoading}
             amount={item.amount ? item.amount.toString() : null}
+            onAmountUnitChange={(_previousUnit, newUnit) => this.setState({ amountUnit: newUnit })}
             onChangeText={text => {
               item.amount = text;
               const transactions = this.state.addresses;

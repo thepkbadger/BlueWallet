@@ -2248,6 +2248,7 @@ export class BlueBitcoinAmount extends Component {
     isLoading: PropTypes.bool,
     amount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     onChangeText: PropTypes.func,
+    onAmountUnitChange: PropTypes.func,
     disabled: PropTypes.bool,
     previousUnit: PropTypes.string,
   };
@@ -2273,7 +2274,7 @@ export class BlueBitcoinAmount extends Component {
       newUnit = BitcoinUnit.BTC;
       previousUnit = BitcoinUnit.LOCAL_CURRENCY;
     }
-    this.setState({ unit: newUnit });
+    this.setState({ unit: newUnit }, () => this.props.onAmountUnitChange(previousUnit, newUnit));
   };
 
   render() {
@@ -2314,24 +2315,29 @@ export class BlueBitcoinAmount extends Component {
                 keyboardType="numeric"
                 onChangeText={text => {
                   text = text.trim();
-                  text = text.replace(',', '.');
-                  const split = text.split('.');
-                  if (split.length >= 2) {
-                    text = `${parseInt(split[0], 10)}.${split[1]}`;
-                  } else {
-                    text = `${parseInt(split[0], 10)}`;
-                  }
-                  text = this.state.unit === BitcoinUnit.BTC ? text.replace(/[^0-9.]/g, '') : text.replace(/[^0-9]/g, '');
-                  text = text.replace(/(\..*)\./g, '$1');
 
-                  if (text.startsWith('.')) {
-                    text = '0.';
+                  if (this.state.unit !== BitcoinUnit.LOCAL_CURRENCY) {
+                    text = text.replace(',', '.');
+                    const split = text.split('.');
+                    if (split.length >= 2) {
+                      text = `${parseInt(split[0], 10)}.${split[1]}`;
+                    } else {
+                      text = `${parseInt(split[0], 10)}`;
+                    }
+                    text = this.state.unit === BitcoinUnit.BTC ? text.replace(/[^0-9.]/g, '') : text.replace(/[^0-9]/g, '');
+                    text = text.replace(/(\..*)\./g, '$1');
+
+                    if (text.startsWith('.')) {
+                      text = '0.';
+                    }
+                    text = text.replace(/(0{1,}.)\./g, '$1');
+                    if (this.state.unit !== BitcoinUnit.BTC) {
+                      text = text.replace(/[^0-9.]/g, '');
+                    }
+                    this.props.onChangeText(text);
+                  } else {
+                    this.props.onChangeText(text);
                   }
-                  text = text.replace(/(0{1,}.)\./g, '$1');
-                  if (this.state.unit !== BitcoinUnit.BTC) {
-                    text = text.replace(/[^0-9.]/g, '');
-                  }
-                  this.props.onChangeText(text);
                 }}
                 onBlur={() => {
                   if (this.props.onBlur) this.props.onBlur();
