@@ -2250,12 +2250,11 @@ export class BlueBitcoinAmount extends Component {
     onChangeText: PropTypes.func,
     onAmountUnitChange: PropTypes.func,
     disabled: PropTypes.bool,
-    previousUnit: PropTypes.string,
   };
 
   constructor(props) {
     super(props);
-    this.state = { unit: props.unit || BitcoinUnit.BTC };
+    this.state = { unit: props.unit || BitcoinUnit.BTC, previousUnit: BitcoinUnit.SATS };
   }
 
   changeAmountUnit = () => {
@@ -2263,18 +2262,33 @@ export class BlueBitcoinAmount extends Component {
     let newUnit;
     if (previousUnit === BitcoinUnit.BTC) {
       newUnit = BitcoinUnit.SATS;
-      previousUnit = BitcoinUnit.BTC;
     } else if (previousUnit === BitcoinUnit.SATS) {
       newUnit = BitcoinUnit.LOCAL_CURRENCY;
-      previousUnit = BitcoinUnit.SATS;
     } else if (previousUnit === BitcoinUnit.LOCAL_CURRENCY) {
       newUnit = BitcoinUnit.BTC;
-      previousUnit = BitcoinUnit.LOCAL_CURRENCY;
     } else {
       newUnit = BitcoinUnit.BTC;
-      previousUnit = BitcoinUnit.LOCAL_CURRENCY;
+      previousUnit = BitcoinUnit.SATS;
     }
-    this.setState({ unit: newUnit }, () => this.props.onAmountUnitChange(previousUnit, newUnit));
+    this.setState({ unit: newUnit, previousUnit }, () => this.props.onAmountUnitChange(previousUnit, newUnit));
+  };
+
+  amountSat = () => {
+    let amountSat = 0;
+    const previousUnit = this.state.previousUnit;
+    const unit = this.state.unit;
+    const amount = this.props.amount;
+    if (previousUnit === BitcoinUnit.SATS && unit === BitcoinUnit.BTC) {
+      amountSat = new BigNumber(amount).dividedBy(0.00000001).multipliedBy(1);
+    } else if (previousUnit === BitcoinUnit.LOCAL_CURRENCY && unit === BitcoinUnit.BTC) {
+      const btc = currency.fiatToBTC(amount);
+      amountSat = loc.formatBalanceWithoutSuffix(btc, BitcoinUnit.BTC, true);
+    } else if (previousUnit === BitcoinUnit.BTC && unit === BitcoinUnit.SATS) {
+      amountSat = amount;
+    } else if (previousUnit === BitcoinUnit.SATS && unit === BitcoinUnit.LOCAL_CURRENCY) {
+      amountSat = new BigNumber(amount).dividedBy(7000).toFixed(8);
+    }
+    return amountSat;
   };
 
   render() {
@@ -2334,9 +2348,9 @@ export class BlueBitcoinAmount extends Component {
                     if (this.state.unit !== BitcoinUnit.BTC) {
                       text = text.replace(/[^0-9.]/g, '');
                     }
-                    this.props.onChangeText(text);
+                    this.props.onChangeText({ amount: text, sats: this.amountSat() });
                   } else {
-                    this.props.onChangeText(text);
+                    this.props.onChangeText({ amount: text, sats: this.amountSat() });
                   }
                 }}
                 onBlur={() => {
