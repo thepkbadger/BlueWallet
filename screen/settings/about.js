@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Linking, Dimensions, Image, View, Text } from 'react-native';
-import { useNavigation } from 'react-navigation-hooks';
+import { useNavigation } from '@react-navigation/native';
 import {
   BlueTextCentered,
   BlueLoading,
@@ -85,7 +85,7 @@ const About = () => {
             <Text style={{ maxWidth: 260, marginBottom: 40, color: '#0C2550', fontSize: 15, textAlign: 'center', fontWeight: '500' }}>
               Always backup your keys!
             </Text>
-            <BlueButton onPress={handleOnRatePress} title="help with a review ⭐🙏" />
+            <BlueButton onPress={handleOnRatePress} title="Leave us a review ⭐🙏" />
           </View>
         </BlueCard>
         <BlueListItem

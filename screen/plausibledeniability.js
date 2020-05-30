@@ -70,7 +70,7 @@ export default class PlausibleDeniability extends Component {
                 EV(EV.enum.TRANSACTIONS_COUNT_CHANGED);
                 ReactNativeHapticFeedback.trigger('notificationSuccess', { ignoreAndroidSystemSettings: false });
                 alert(loc.plausibledeniability.success);
-                this.props.navigation.navigate('Wallets');
+                this.props.navigation.popToTop();
               }}
             />
           </ScrollView>
@@ -83,6 +83,6 @@ export default class PlausibleDeniability extends Component {
 PlausibleDeniability.propTypes = {
   navigation: PropTypes.shape({
     navigate: PropTypes.func,
-    goBack: PropTypes.func,
+    popToTop: PropTypes.func,
   }),
 };
