@@ -38,6 +38,7 @@ export default class Language extends Component {
         { label: 'Português (BR)', value: 'pt_br' },
         { label: 'Português (PT)', value: 'pt_pt' },
         { label: 'Русский', value: 'ru' },
+        { label: 'Slovenščina (SI)', value: 'sl_sl'},
         { label: 'Svenska (SE)', value: 'sv_se' },
         { label: 'Thai (TH)', value: 'th_th' },
         { label: 'Vietnamese (VN)', value: 'vi_vn' },
